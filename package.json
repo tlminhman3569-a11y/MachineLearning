@@ -1,0 +1,15 @@
+{
+  "name": "TranLeMinhMan_23130186_Tetris",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.1",
+    "sass": "^1.105.1",
+    "scss": "^0.2.4"
+  }
+}

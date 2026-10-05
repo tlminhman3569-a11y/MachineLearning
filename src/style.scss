@@ -1,0 +1,152 @@
+$background: #FFFFFF;
+$font-color: #202536;
+$card-header: #737B8F;
+$purple: #6C54E8;
+$active-button: #EEEAFE;
+body{
+  margin:0;
+  padding:0;
+  height:100vh;
+  background-image: url("../img/background.jpg") ;
+  font-size: 16px;
+  color: $font-color;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+// MAIN MENU
+.main-menu{
+  height: 100%;
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-direction: column;
+}
+
+.menu-header{
+  margin: 20px 20px 0 0;
+}
+
+.header-title{
+  padding:0;
+  margin-left: 40px;
+}
+
+.menu-body{
+  display: flex;
+  align-items: flex-start;
+
+
+
+  .level-list{
+    align-items: center;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap:20px;
+    flex-grow: 1;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+.level-item{
+  width:100%;
+}
+
+.btn-level{
+  display:flex;
+  flex-direction: column;
+  align-items:flex-start;
+  border: 2px solid #888888;
+  border-radius: 15px;
+  width: 100%;
+  max-width:100%;
+  min-height: 200px;
+  box-sizing: border-box;
+  padding: 20px;
+  background: $background;
+}
+
+.btn-level:hover{
+  border: 2px solid $purple;
+  scale: 1.05;
+  transition: 0.3s;
+  box-shadow: 0 5px 15px #7a7979;
+}
+
+.btn-level:active{
+  background:$active-button;
+  border: 2px solid $purple;
+  scale: 1.05;
+  transition: 0.3s;
+  box-shadow: 0 5px 15px #7a7979;
+}
+.card-header{
+}
+
+.level-title{
+  color: $card-header;
+  font-weight:700;
+
+}
+
+.card-body{
+  display:flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .main-title{
+    padding:0;
+    margin-top: 15px;
+    text-align: left;
+    font-size: 1.3rem;
+    margin-bottom:0;
+  }
+
+  .description{
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: $card-header;
+    text-align: left;
+    padding:0;
+  }
+}
+
+.card-footer{
+  width:100%;
+  margin-top: 60px;
+  align-items: center;
+
+  .score-point{
+    color: black;
+    font-size:0.9rem;
+  }
+}
+
+.menu-footer{
+  width:100%;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+
+}
+
+.btn-play{
+  background: $purple;
+  padding: 30px 60px;
+  border-radius: 30px;
+
+  i,span{
+    color: white;
+    font-size: 1.3rem;
+  }
+}
+
+.btn-play:hover {
+  filter: brightness(1.1);
+}
+
+.btn-play:active{
+  filter: brightness(0.8);
+}
