@@ -10,7 +10,7 @@
 <body>
 
 <!-- Trang giao diện Main menu-->
-<div class="main-menu hidden" id="main-menu">
+<div class="main-menu-screen hidden" id="main-menu-screen">
 
 <!--    Header main menu-->
     <div class="menu-header">
@@ -151,9 +151,45 @@
 <!-- trang giao diện chơi-->
 <div id="play-screen" class="play-screen">
 
+<!--    Lớp phủ dừng màn hình-->
+    <div class="pause-overlay hidden">
+        <div class="pause-panel">
+            <div class="panel-title">
+                <i class="fa-solid fa-pause"></i>
+                <p class = "panel-header-title">PAUSE GAME</p>
+            </div>
+
+
+            <div class="panel-option">
+                <button class="resume" id="resume">
+                    <i class="fa-regular fa-circle-play"></i>
+                    <span class="resume-title">Resume</span>
+                </button>
+
+                <button class="Restart" id="restart">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span class="restart-title">Restart</span>
+                </button>
+
+                <button class="main-menu" id="main-menu">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="resume-title">Main Menu</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
 <!--    Màn hình vẽ tetris-->
     <div class="canvas-wrapper">
         <canvas id="tetris-screen" class="tetris-screen"></canvas>
+    </div>
+
+<!-- Khối dự đoán tetris tiếp theo-->
+    <div class="next-tetris-wrapper">
+        <div class="next-tetris-group">
+            <p class="next-title">NEXT PIECE</p>
+            <canvas class="next-tetris" id="next-tetris"></canvas>
+        </div>
     </div>
 
 <!--    Sidebar bên cạnh-->
@@ -178,10 +214,6 @@
             </div>
         </div>
 
-<!--        Khối dự đoán tetris tiếp theo-->
-        <div class="next-tetris-wrapper">
-            <canvas class="next-tetris" id="next-tetris"></canvas>
-        </div>
 
 <!--        Khối pause-->
         <div class="pause-wrapper">
