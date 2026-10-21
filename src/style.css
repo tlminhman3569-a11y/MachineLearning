@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -161,24 +165,24 @@ body {
 .tetris-screen {
   width: 300px;
   height: 600px;
-  background: #E4E7F0;
+  background: #E7EBF2;
   border: 2px solid #737B8F;
 }
 
 .sidebar {
   height: 626px;
-  margin-right: 170px;
+  margin-right: 200px;
   grid-column: 3;
   display: flex;
   flex-direction: column;
-  background: red;
+  border-radius: 18px;
   gap: 20px;
   width: 280px;
 }
 
 .level-block, .next-tetris-wrapper, .pause-wrapper {
   border-radius: 18px;
-  border: 2px solid #E4E7F0;
+  border: 2px solid #E7EBF2;
 }
 
 .level-block {
@@ -188,7 +192,7 @@ body {
 }
 
 .level-information {
-  border-bottom: 1px solid #E4E7F0;
+  border-bottom: 1px solid #E7EBF2;
   padding: 10px 0;
 }
 .level-information .title {
@@ -252,8 +256,46 @@ body {
 .next-tetris-wrapper .next-tetris {
   width: 150px;
   height: 150px;
-  background: #E4E7F0;
+  background: #E7EBF2;
   border-radius: 18px;
+}
+
+.pause-wrapper {
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  box-sizing: border-box;
+}
+
+.pause {
+  width: 100%;
+  padding: 18px 0;
+  background: white;
+  border: none;
+}
+.pause i, .pause .pause-title {
+  padding: 0 1px;
+}
+.pause i {
+  color: #6C54E8;
+}
+.pause .pause-title {
+  font-weight: 700;
+}
+
+.pause:hover {
+  background: #EEEAFE;
+  border: 2px solid #6C54E8;
+  border-radius: 18px;
+}
+
+.pause:active {
+  filter: brightness(0.8);
 }
 
 /*# sourceMappingURL=style.css.map */

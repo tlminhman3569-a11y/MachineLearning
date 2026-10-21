@@ -3,7 +3,10 @@ $font-color: #202536;
 $light-gray: #737B8F;
 $purple: #6C54E8;
 $active-button: #EEEAFE;
-$lighter-gray: #E4E7F0;
+$lighter-gray: #E7EBF2;
+*{
+  box-sizing: border-box;
+}
 body{
   margin:0;
   padding:0;
@@ -188,12 +191,13 @@ body{
 
 .sidebar{
   height:626px;
-  margin-right: 170px;
+  margin-right: 200px;
   grid-column: 3;
   display: flex;
 
   flex-direction: column;
-  background: red;
+  //background: white;
+  border-radius:18px;
   gap:20px;
   width:280px;
 }
@@ -281,6 +285,49 @@ body{
     background: $lighter-gray;
     border-radius: 18px;
   }
+}
+
+.pause-wrapper{
+  line-height:0;
+  margin:0;
+  padding:0;
+  width: 100%;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  display:flex;
+  box-sizing: border-box;
+}
+
+.pause{
+  width: 100%;
+  padding: 18px 0;
+  background: white;
+  border: none;
+
+
+  i, .pause-title{
+    padding:0 1px;
+  }
+
+  i{
+    color: $purple;
+  }
+
+  .pause-title{
+    font-weight: 700;
+  }
+
+}
+
+.pause:hover{
+  background: $active-button;
+  border: 2px solid $purple;
+  border-radius: 18px;
+}
+
+.pause:active{
+  filter: brightness(0.8);
 }
 
 
