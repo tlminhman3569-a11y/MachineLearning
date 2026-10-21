@@ -9,8 +9,8 @@
 </head>
 <body>
 
-<!-- Main menu-->
-<div class="main-menu" id="main-menu">
+<!-- Trang giao diện Main menu-->
+<div class="main-menu hidden" id="main-menu">
 
 <!--    Header main menu-->
     <div class="menu-header">
@@ -27,7 +27,7 @@
                 <button class="btn-level" data-level="1">
 
                     <div class="card-header">
-                        <span class="level-title">LEVEL 01</span>
+                        <span class="level-title">LEVEL 1</span>
                     </div>
 
                     <div class="card-body">
@@ -46,7 +46,7 @@
                 <button class="btn-level" data-level="2">
 
                     <div class="card-header">
-                        <span class="level-title">LEVEL 02</span>
+                        <span class="level-title">LEVEL 2</span>
                     </div>
 
                     <div class="card-body">
@@ -65,7 +65,7 @@
                 <button class="btn-level" data-level="3">
 
                     <div class="card-header">
-                        <span class="level-title">LEVEL 03</span>
+                        <span class="level-title">LEVEL 3</span>
                     </div>
 
                     <div class="card-body">
@@ -84,7 +84,7 @@
                 <button class="btn-level" data-level="4">
 
                     <div class="card-header">
-                        <span class="level-title">LEVEL 04</span>
+                        <span class="level-title">LEVEL 4</span>
                     </div>
 
                     <div class="card-body">
@@ -103,7 +103,7 @@
                 <button class="btn-level" data-level="5">
 
                     <div class="card-header">
-                        <span class="level-title">LEVEL 05</span>
+                        <span class="level-title">LEVEL 5</span>
                     </div>
 
                     <div class="card-body">
@@ -122,7 +122,7 @@
                 <button class="btn-level" data-level="6">
 
                     <div class="card-header">
-                        <span class="level-title">LEVEL 06</span>
+                        <span class="level-title">LEVEL 6</span>
                     </div>
 
                     <div class="card-body">
@@ -147,5 +147,53 @@
 
 
 </div>
+
+<!-- trang giao diện chơi-->
+<div id="play-screen" class="play-screen">
+
+<!--    Màn hình vẽ tetris-->
+    <div class="canvas-wrapper">
+        <canvas id="tetris-screen" class="tetris-screen"></canvas>
+    </div>
+
+<!--    Sidebar bên cạnh-->
+    <div class="sidebar">
+
+<!--        Khối thông tin level-->
+        <div class="level-block">
+            <div class="level-information">
+                <p class="title">Level
+                    <span class="current-level" id = "current-level"> 1</span>
+                </p>
+            </div>
+
+            <div class="score-wrapper">
+                <p class="current-score">Score</p>
+                <p class="current-score-point">24440</p>
+            </div>
+
+            <div class="target-wrapper">
+                <p class="target-score">Target score</p>
+                <p class="target-score-point">24440</p>
+            </div>
+        </div>
+
+<!--        Khối dự đoán tetris tiếp theo-->
+        <div class="next-tetris-wrapper">
+            <canvas class="next-tetris" id="next-tetris"></canvas>
+        </div>
+
+<!--        Khối pause-->
+        <div class="pause-wrapper">
+            <button class="pause">
+                <i class="fa-solid fa-pause"></i>
+                <span class="pause-title">PAUSE GAME</span>
+            </button>
+        </div>
+
+    </div>
+</div>
+<!--Script-->
+<script src="index.js"></script>
 </body>
 </html>

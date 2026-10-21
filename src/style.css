@@ -3,10 +3,16 @@ body {
   padding: 0;
   height: 100vh;
   background-image: url("../img/background.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
   font-size: 16px;
   color: #202536;
   overflow: hidden;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .main-menu {
@@ -62,11 +68,11 @@ body {
 .btn-level:hover {
   border: 2px solid #6C54E8;
   scale: 1.05;
-  transition: 0.3s;
+  transition: 0.3s all ease;
   box-shadow: 0 5px 15px #7a7979;
 }
 
-.btn-level:active {
+.btn-level.active {
   background: #EEEAFE;
   border: 2px solid #6C54E8;
   scale: 1.05;
@@ -132,6 +138,122 @@ body {
 
 .btn-play:active {
   filter: brightness(0.8);
+}
+
+.play-screen {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  justify-items: center;
+  align-items: center;
+}
+
+.canvas-wrapper {
+  margin: 0;
+  padding: 0;
+  grid-column: 2;
+  line-height: 0;
+  border: 12px solid white;
+  border-radius: 10px;
+}
+
+.tetris-screen {
+  width: 300px;
+  height: 600px;
+  background: #E4E7F0;
+  border: 2px solid #737B8F;
+}
+
+.sidebar {
+  height: 626px;
+  margin-right: 170px;
+  grid-column: 3;
+  display: flex;
+  flex-direction: column;
+  background: red;
+  gap: 20px;
+  width: 280px;
+}
+
+.level-block, .next-tetris-wrapper, .pause-wrapper {
+  border-radius: 18px;
+  border: 2px solid #E4E7F0;
+}
+
+.level-block {
+  background: white;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.level-information {
+  border-bottom: 1px solid #E4E7F0;
+  padding: 10px 0;
+}
+.level-information .title {
+  display: flex;
+  justify-content: space-between;
+  color: #737B8F;
+  font-weight: 700;
+  align-items: center;
+}
+.level-information .current-level {
+  color: #202536;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.score-wrapper {
+  margin-top: 20px;
+}
+.score-wrapper .current-score {
+  color: #737B8F;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+}
+.score-wrapper .current-score-point {
+  color: #202536;
+  font-size: 2rem;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+}
+
+.target-wrapper {
+  margin-top: 20px;
+}
+.target-wrapper .target-score {
+  color: #737B8F;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+}
+.target-wrapper .target-score-point {
+  color: #202536;
+  font-size: 2rem;
+  font-weight: 500;
+  margin: 0;
+  padding-bottom: 20px;
+}
+
+.next-tetris-wrapper {
+  line-height: 0;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 60%;
+  height: 168px;
+  margin-left: auto;
+  margin-right: auto;
+  background: white;
+}
+.next-tetris-wrapper .next-tetris {
+  width: 150px;
+  height: 150px;
+  background: #E4E7F0;
+  border-radius: 18px;
 }
 
 /*# sourceMappingURL=style.css.map */

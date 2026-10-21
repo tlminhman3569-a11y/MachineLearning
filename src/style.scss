@@ -1,17 +1,23 @@
 $background: #FFFFFF;
 $font-color: #202536;
-$card-header: #737B8F;
+$light-gray: #737B8F;
 $purple: #6C54E8;
 $active-button: #EEEAFE;
+$lighter-gray: #E4E7F0;
 body{
   margin:0;
   padding:0;
   height:100vh;
   background-image: url("../img/background.jpg") ;
+  background-repeat: no-repeat;
+  background-size: cover;
   font-size: 16px;
   color: $font-color;
   overflow: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.hidden{
+  display: none !important;
 }
 
 // MAIN MENU
@@ -71,11 +77,11 @@ body{
 .btn-level:hover{
   border: 2px solid $purple;
   scale: 1.05;
-  transition: 0.3s;
+  transition: 0.3s all ease;
   box-shadow: 0 5px 15px #7a7979;
 }
 
-.btn-level:active{
+.btn-level.active{
   background:$active-button;
   border: 2px solid $purple;
   scale: 1.05;
@@ -86,7 +92,7 @@ body{
 }
 
 .level-title{
-  color: $card-header;
+  color: $light-gray;
   font-weight:700;
 
 }
@@ -107,7 +113,7 @@ body{
   .description{
     margin-top: 10px;
     font-size: 0.9rem;
-    color: $card-header;
+    color: $light-gray;
     text-align: left;
     padding:0;
   }
@@ -150,3 +156,133 @@ body{
 .btn-play:active{
   filter: brightness(0.8);
 }
+
+// Trang play game
+
+.play-screen{
+  width:100%;
+  height: 100%;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  //background:red;
+  justify-items: center;
+  align-items: center;
+}
+
+.canvas-wrapper{
+  margin:0;
+  padding:0;
+  //background:blue;
+  grid-column:2;
+  line-height:0;
+  border: 12px solid white;
+  border-radius:10px;
+}
+
+.tetris-screen{
+  width: 300px;
+  height: 600px;
+  background: $lighter-gray;
+  border: 2px solid $light-gray;
+}
+
+.sidebar{
+  height:626px;
+  margin-right: 170px;
+  grid-column: 3;
+  display: flex;
+
+  flex-direction: column;
+  background: red;
+  gap:20px;
+  width:280px;
+}
+
+.level-block, .next-tetris-wrapper, .pause-wrapper{
+  border-radius: 18px;
+  border:2px solid $lighter-gray;
+}
+.level-block{
+  background: white;
+  padding-left: 25px;
+  padding-right: 25px;
+
+}
+
+.level-information{
+  border-bottom: 1px solid $lighter-gray;
+  padding: 10px 0;
+  .title{
+    display:flex;
+    justify-content: space-between;
+    color: $light-gray;
+    font-weight:700;
+    align-items: center;
+
+  }
+
+  .current-level{
+    color: $font-color;
+    font-size:1.5rem;
+    font-weight:500;
+  }
+
+}
+
+.score-wrapper{
+  margin-top:20px;
+  .current-score{
+    color: $light-gray;
+    font-weight:700;
+    margin:0;
+    padding:0;
+  }
+
+  .current-score-point{
+    color: $font-color;
+    font-size:2rem;
+    font-weight:500;
+    margin:0;
+    padding:0;
+  }
+}
+
+.target-wrapper{
+  margin-top:20px;
+  .target-score{
+    color: $light-gray;
+    font-weight:700;
+    margin:0;
+    padding:0;
+  }
+
+  .target-score-point{
+    color: $font-color;
+    font-size:2rem;
+    font-weight:500;
+    margin:0;
+    padding-bottom:20px;
+  }
+}
+
+.next-tetris-wrapper{
+  line-height: 0;
+  justify-content: center;
+  align-items: center;
+  display:flex;
+  width: 60%;
+  height: calc(280px * 0.6);
+  margin-left: auto;
+  margin-right: auto;
+  background: white;
+  .next-tetris{
+    width: 150px;
+    height:150px;
+    background: $lighter-gray;
+    border-radius: 18px;
+  }
+}
+
+
+
+
