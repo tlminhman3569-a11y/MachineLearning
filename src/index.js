@@ -94,7 +94,7 @@ const TETRIS_BLOCK = {
         x: 3,
         y: 2,
         x_predict: 0,
-        y_predict: 2,
+        y_predict: 1,
     },
 
 }
@@ -126,15 +126,15 @@ const GAME_STATE={
     lastTimeStamp:0,
     timeCounter:0,
     player: {
-        current_block: TETRIS_BLOCK[T_BAG[0]].matrix, // mảng 2 chiều của khối hiện tại
-        next_block: TETRIS_BLOCK[T_BAG[1]].matrix, // mảng 2 chiều của khối tiếp theo
+        current_block: T_BAG[0], // mảng 2 chiều của khối hiện tại
+        next_block: T_BAG[1], // mảng 2 chiều của khối tiếp theo
         position: {x: 0, y: 0}
     }
 }
 
 // Hàm tạo list 7 khối random
 function createTBag() {
-    const tempBag = Array.from(T_BAG);
+    const tempBag = Object.keys(TETRIS_BLOCK);
     const Bag=[];
     for (let i = tempBag.length; i > 0 ; i--) {
         const random = Math.floor(Math.random() * i)
@@ -184,40 +184,40 @@ function navigateScreen(){
 
 
 // hàm vẽ board
-function drawBoard(){
-    for (let row = 0; row < ROWS; row++) {
-        for (let col = 0; col < COLS; col++) {
+function drawBoard(board, context){
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[0].length; col++) {
             let x = col * SCALE;
             let y = row * SCALE;
-            let color = GAME_STATE.board[row][col];
+            let color = board[row][col];
 
-            drawSquare(x, y, color);
-            console.log("in xong dòng: " + row + ", cột: " + col + "vị trí tọa độ x: " + x + " y: " + y);
+            drawSquare(x, y, color, context);
         }
 
     }
 }
 
 // Hàm vẽ khối block hiện tại của người chơi
-function drawPiece(){
-    for (let row = 0; row < GAME_STATE.player.current_block.length; row++) {
-        for (let col = 0; col < GAME_STATE.player.current_block[0].length; col++) {
-            let blockX = (col + GAME_STATE.player.position.x) * SCALE;
-            let blockY = (row + GAME_STATE.player.position.y) * SCALE;
-
-            drawSquare(blockX, blockY, GAME_STATE.player.current_block);
+function drawPiece(x, y, block_matrix, context){
+    for (let row = 0; row < block_matrix.length; row++) {
+        for (let col = 0; col < block_matrix[0].length; col++) {
+            let color = block_matrix[row][col]
+            if(color !== 0) {
+                let blockX = (x + col) * SCALE;
+                let blockY = (y +row) * SCALE;
+                drawSquare(blockX, blockY, color, context);
+            }
         }
     }
-
 }
 // hàm vẽ ô vuông
-function drawSquare(x, y, color) {
-    CTX.fillStyle =  BLOCK_COLOR[color];
-    CTX.fillRect(x, y, SCALE, SCALE);
+function drawSquare(x, y, color, context) {
+    context.fillStyle =  BLOCK_COLOR[color];
+    context.fillRect(x, y, SCALE, SCALE);
 
-    CTX.strokeStyle = "#111";
-    CTX.lineWidth = 0.5;
-    CTX.strokeRect(x, y, SCALE, SCALE);
+    context.strokeStyle = "#111";
+    context.lineWidth = 0.5;
+    context.strokeRect(x, y, SCALE, SCALE);
 
 }
 
@@ -228,17 +228,26 @@ function clearCanvas(){
 
 // Hàm loop game
 function gameLoop(timeStamp){
+    const predict_block_matrix = TETRIS_BLOCK[GAME_STATE.player.next_block].matrix;
+    const xPredict = TETRIS_BLOCK[GAME_STATE.player.next_block].x_predict;
+    const yPredict = TETRIS_BLOCK[GAME_STATE.player.next_block].y_predict;
+
     const timePass = timeStamp - GAME_STATE.lastTimeStamp;
+
     GAME_STATE.lastTimeStamp = timeStamp;
     GAME_STATE.timeCounter += timePass;
     if(GAME_STATE.timeCounter  >= GAME_STATE.interval){
         GAME_STATE.timeCounter -= GAME_STATE.interval;
+
+        // console.log(T_BAG, predict_block_matrix, xPredict, yPredict);
         // Thực hiện sau 1 giây có những phương thức
+
     }
 
     clearCanvas();
-    drawBoard();
-    drawPiece();
+    drawBoard(GAME_STATE.board_predict, CTX_PREDICT);
+    drawPiece(xPredict, yPredict, predict_block_matrix, CTX_PREDICT);
+
 
     requestAnimationFrame(gameLoop);
 }
