@@ -10,7 +10,7 @@
 <body>
 
 <!-- Trang giao diện Main menu-->
-<div class="main-menu-screen hidden" id="main-menu-screen">
+<div class="main-menu-screen active screen" id="main-menu-screen">
 
 <!--    Header main menu-->
     <div class="menu-header">
@@ -139,7 +139,7 @@
     </div>
 
     <div class="menu-footer">
-        <button class="btn-play">
+        <button class="nav-btn btn-play" data-screen="play-screen">
             <i class="fa-solid fa-play"></i>
             <span class="play-title">PLAY NOW</span>
         </button>
@@ -149,10 +149,10 @@
 </div>
 
 <!-- trang giao diện chơi-->
-<div id="play-screen" class="play-screen">
+<div id="play-screen" class="play-screen screen">
 
 <!--    Lớp phủ dừng màn hình-->
-    <div class="pause-overlay hidden">
+    <div class="pause-overlay">
         <div class="pause-panel">
             <div class="panel-title">
                 <i class="fa-solid fa-pause"></i>
@@ -181,14 +181,14 @@
 
 <!--    Màn hình vẽ tetris-->
     <div class="canvas-wrapper">
-        <canvas id="tetris-screen" class="tetris-screen"></canvas>
+        <canvas id="tetris-screen" class="tetris-screen" width= "300" height="600"></canvas>
     </div>
 
 <!-- Khối dự đoán tetris tiếp theo-->
     <div class="next-tetris-wrapper">
         <div class="next-tetris-group">
             <p class="next-title">NEXT PIECE</p>
-            <canvas class="next-tetris" id="next-tetris"></canvas>
+            <canvas class="next-tetris" width= "150" height="150" id="next-tetris"></canvas>
         </div>
     </div>
 
