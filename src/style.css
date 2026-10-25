@@ -159,7 +159,11 @@ body {
   display: none;
 }
 
-.pause-overlay.overlay.active {
+.over-overlay {
+  display: none;
+}
+
+.pause-overlay.overlay.active, .over-overlay.overlay.active {
   position: absolute;
   top: 0;
   left: 0;
@@ -173,7 +177,7 @@ body {
   z-index: 99;
 }
 
-.pause-panel {
+.pause-panel, .over-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -184,13 +188,13 @@ body {
   border: 2px solid #E7EBF2;
 }
 
-.panel-title {
+.panel-title, .over-title {
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: center;
 }
-.panel-title i {
+.panel-title i, .over-title i {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,9 +205,15 @@ body {
   border: 25px solid #EEEAFE;
   border-radius: 12px;
 }
-.panel-title p {
+.panel-title p.panel-header-title, .over-title p.panel-header-title {
   margin-top: 20px;
   margin-bottom: 40px;
+  line-height: 1;
+  font-weight: 700;
+}
+.panel-title p.over-header-title, .over-title p.over-header-title {
+  margin-top: 20px;
+  margin-bottom: 25px;
   line-height: 1;
   font-weight: 700;
 }
@@ -236,6 +246,29 @@ body {
 }
 .panel-option span {
   font-weight: 700;
+}
+
+.over-describe {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+.over-describe .describe {
+  margin-bottom: 10px;
+}
+.over-describe .describe, .over-describe .current-score-point, .over-describe .target-score-point {
+  color: black;
+  margin-top: 0;
+  line-height: 1;
+  font-weight: 700;
+}
+.over-describe .current-score, .over-describe .target-score {
+  text-align: left;
+  color: #737B8F;
+  font-weight: 700;
+  margin: 0;
+  padding: 2px;
 }
 
 .canvas-wrapper {

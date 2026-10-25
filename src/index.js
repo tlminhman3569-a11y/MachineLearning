@@ -123,7 +123,7 @@ const STATE={
         current_state: STATE.MENU,
         level: 1,
         score: 0,
-        score_target:0,
+        score_target:1000,
         board:  Array.from({length: TOTAL_ROWS}, () => Array(COLS).fill(0)),
         board_predict: Array.from({length: ROWS_PREDICT}, () => Array(COLS_PREDICT).fill(0)),
         interval: 1000,
@@ -146,6 +146,17 @@ function renderPlayScreenUI(){
     curLevel.textContent = GAME_STATE.level;
 
     const curTargetScore = document.getElementById('target-score');
+    curTargetScore.textContent = GAME_STATE.score_target;
+}
+
+// hàm render current score và target score cho over ui
+function renderOverUI(){
+    clickedBtnOverlay();
+    const curScore = document.getElementById('over-current-score');
+    curScore.textContent = GAME_STATE.score;
+    curScore.style.color = "#c61515";
+
+    const curTargetScore = document.getElementById('over-target-score');
     curTargetScore.textContent = GAME_STATE.score_target;
 }
 
@@ -353,6 +364,9 @@ function isCollide(){
 
 // hàm cập nhật điểm khi ăn dòng
 function updateScore(totalClearedLines) {
+    if(passTarget()){
+        CURRENT_SCORE_POINT.style.color = "#008001";
+    }
     if(totalClearedLines !== 0){
         const score = 100;
         GAME_STATE.score += totalClearedLines * score + (score * (totalClearedLines - 1));
@@ -400,6 +414,16 @@ function mergeBoard(){
     }
 }
 
+// hàm hiển thị kết thúc game do over
+function displayOver(){
+    GAME_STATE.current_state = STATE.OVER;
+    const over_overlay = document.getElementById("over-overlay");
+    if(over_overlay){
+        over_overlay.classList.add("active");
+        renderOverUI();
+    }
+}
+
 // hàm di chuyển khối hiện tại xuống mỗi giây
 function gravity(){
     GAME_STATE.player.position.y += 1;
@@ -408,6 +432,8 @@ function gravity(){
         mergeBoard();
         clearLines();
         spawnNewTetris();
+        if(isCollide())
+            displayOver();
     }
 }
 
@@ -459,7 +485,6 @@ function clickedPlayBtn(){
         renderPlayScreenUI();
         GAME_STATE.current_state = STATE.PLAYING;
         GAME_STATE.lastTimeStamp = performance.now();
-        moveTetris();
         spawnNewTetris();
         clickedPauseBtn();
         requestAnimationFrame(gameLoop);
@@ -473,7 +498,7 @@ function clickedPauseBtn(){
         if(pauseOverlay){
             pauseOverlay.classList.add('active');
             GAME_STATE.current_state = STATE.PAUSE;
-            clickedBtnPauseOverlay();
+            clickedBtnOverlay();
         }
     })
 }
@@ -499,16 +524,17 @@ function resetGame(){
 }
 
 // hàm gán sự kiện cho 3 nút trong pause overlay
-function clickedBtnPauseOverlay(){
-    const allBtn = document.querySelectorAll('[data-panelOption]');
+function clickedBtnOverlay(){
+    const allBtn = document.querySelectorAll('[data-Option]');
     allBtn.forEach((button) => {
         button.addEventListener('click', function(e){
-            if(button.getAttribute('data-panelOption') === "Resume"){
+            if(button.getAttribute('data-Option') === "Resume"){
                 GAME_STATE.current_state = STATE.PLAYING;
                 removeActiveOverlay("pause-overlay");
             }
-            else if(button.getAttribute('data-panelOption') === "Restart"){
+            else if(button.getAttribute('data-Option') === "Restart"){
                 resetGame();
+                removeActiveOverlay("over-overlay");
                 removeActiveOverlay("pause-overlay");
 
             } else{
@@ -516,6 +542,7 @@ function clickedBtnPauseOverlay(){
                 GAME_STATE.current_state = STATE.MENU;
                 navigateScreen();
                 removeActiveOverlay("pause-overlay");
+                removeActiveOverlay("over-overlay");
             }
         })
     })
@@ -526,16 +553,20 @@ function triggerPauseButton(){
     if(pauseOverlay) {
         pauseOverlay.classList.add('active');
         GAME_STATE.current_state = STATE.PAUSE;
-        clickedBtnPauseOverlay();
+        clickedBtnOverlay();
     }
 }
 // hàm kiểm tra xem người dùng có tab sang trang khác ko
 function checkTabVisibility(){
     document.addEventListener('visibilitychange', function(e){
-        if(document.visibilityState === 'hidden'){
+        if(document.visibilityState === 'hidden' && GAME_STATE.current_state === STATE.PLAYING){
             triggerPauseButton();
         }
     })
+}
+// hàm kiểm tra xem current score đạt target chưa
+function passTarget(){
+    return GAME_STATE.score >= GAME_STATE.score_target;
 }
 
 // hàm bắt đầu game
@@ -544,6 +575,7 @@ function initGame(){
     levelSelection();
     navigateScreen();
     clickedPlayBtn();
+    moveTetris();
     checkTabVisibility();
 }
 initGame();

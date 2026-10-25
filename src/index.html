@@ -151,6 +151,38 @@
 <!-- trang giao diện chơi-->
 <div id="play-screen" class="play-screen screen">
 
+<!-- lớp phủ game over-->
+    <div class="over-overlay overlay" id="over-overlay">
+        <div class="over-panel">
+            <div class="over-title">
+                <i class="fa-solid fa-skull-crossbones"></i>
+                <p class = "over-header-title">GAME OVER</p>
+            </div>
+
+            <div class="over-describe">
+                <p class="describe">Rất tiếc, bạn thua rồi!</p>
+
+                <p class="current-score">Score: <span class="current-score-point" id="over-current-score">0</span></p>
+
+
+                <p class="target-score">Target score: <span class="target-score-point" id ="over-target-score">0</span> </p>
+            </div>
+
+
+            <div class="panel-option">
+                <button class="Restart" id="over-restart"  data-Option="Restart">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span class="restart-title">Restart</span>
+                </button>
+
+                <button class="main-menu" id="over-main-menu"  data-Option="MainMenu" data-screen="main-menu-screen">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="resume-title">Main Menu</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
 <!--    Lớp phủ dừng màn hình-->
     <div class="pause-overlay overlay" id="pause-overlay">
         <div class="pause-panel">
@@ -161,17 +193,17 @@
 
 
             <div class="panel-option">
-                <button class="resume" id="resume" data-panelOption="Resume">
+                <button class="resume" id="resume" data-Option="Resume">
                     <i class="fa-regular fa-circle-play"></i>
                     <span class="resume-title">Resume</span>
                 </button>
 
-                <button class="Restart" id="restart"  data-panelOption="Restart">
+                <button class="Restart" id="restart"  data-Option="Restart">
                     <i class="fa-solid fa-rotate-left"></i>
                     <span class="restart-title">Restart</span>
                 </button>
 
-                <button class="main-menu" id="main-menu"  data-panelOption="MainMenu" data-screen="main-menu-screen">
+                <button class="main-menu" id="main-menu"  data-Option="MainMenu" data-screen="main-menu-screen">
                     <i class="fa-solid fa-house"></i>
                     <span class="resume-title">Main Menu</span>
                 </button>
