@@ -110,6 +110,8 @@ const PIECE_COLOR={
     5: '#882CED', // Khối T
     6: '#CF3616', // Khối Z
     7: '#00EAFF', // Khối I
+
+    8: '#CDD8D9' // sương mù
 };
 const T_BAG = createTBag();
 
@@ -120,27 +122,87 @@ const STATE={
     OVER: 'OVER',
     WIN: 'WIN'
 };
-    const createGAME_STATE= () => ({
-        current_state: STATE.MENU,
-        level: 1,
-        score: 0,
-        score_target:1000,
-        board:  Array.from({length: TOTAL_ROWS}, () => Array(COLS).fill(0)),
-        board_predict: Array.from({length: ROWS_PREDICT}, () => Array(COLS_PREDICT).fill(0)),
+
+const LEVEL_CONFIG={
+    1:{
         interval: 1000,
-        lastTimeStamp:0,
-        timeCounter:0,
-        player: {
-            current_piece: null, // mảng 2 chiều của khối hiện tại
-            next_piece: null, // mảng 2 chiều của khối tiếp theo
-            position: {x: 0, y: 0},
-            position_predict: {x: 0, y: 0},
-            isFirstWin: true,
-        }
-    });
+        reverseDirect: false,
+        isFog: false,
+        surpriseWind: false,
+        isShapeShifter: true,
+    },
+    2:{
+        interval: 800,
+        maxInterval: 800,
+        minInterval: 350,
+        reverseDirect: false,
+        isFog: false,
+        surpriseWind: false,
+        isShapeShifter: true,
+    },
+    3:{
+        interval: 650,
+        reverseDirect: true,
+        isFog: false,
+        surpriseWind: false,
+        isShapeShifter: true,
+    },
+    4:{
+        interval: 600,
+        reverseDirect: false,
+        isFog: true,
+        surpriseWind: false,
+        isShapeShifter: true,
+        fogTimer: 0,
+    },
+    5:{
+        interval: 550,
+        reverseDirect: false,
+        isFog: false,
+        surpriseWind: true,
+        isShapeShifter: false,
+        windBlow: [-1, 1],
+        windTimer: 0,
+    },
+    6:{
+        interval: 500,
+        reverseDirect: false,
+        isFog: false,
+        surpriseWind: false,
+        isShapeShifter: true,
+        shapeShifterTimer: 0,
+    }
+}
+const createGAME_STATE= () => ({
+    current_state: STATE.MENU,
+    level: 1,
+    score: 0,
+    score_target:1000,
+    board:  Array.from({length: TOTAL_ROWS}, () => Array(COLS).fill(0)),
+    board_predict: Array.from({length: ROWS_PREDICT}, () => Array(COLS_PREDICT).fill(0)),
+    lastTimeStamp:0,
+    timeCounter:0,
+
+    player: {
+        current_piece: null, // mảng 2 chiều của khối hiện tại
+        next_piece: null, // mảng 2 chiều của khối tiếp theo
+        position: {x: 0, y: 0},
+        position_predict: {x: 0, y: 0},
+        isFirstWin: true,
+    }
+});
 
 let GAME_STATE = createGAME_STATE();
 let animationID;
+
+// hàm thêm config vào GAME_STATE
+function addConfig(){
+    const cfg = LEVEL_CONFIG[GAME_STATE.level];
+    GAME_STATE.config = {
+        ... GAME_STATE.config,
+        ...cfg
+    }
+}
 
 // hàm render lvl và target score cho play screen ui
 function renderPlayScreenUI(){
@@ -175,7 +237,7 @@ function renderWinUI(){
 function renderMainMenuUI(){
     levelBtn.forEach((btn) => {
         const lvl = parseInt(btn.getAttribute('data-level'));
-        const target_score = (1000 * lvl) * 20 / 100;
+        const target_score = (1000 * lvl) * 70 / 100;
         const score_point_display = btn.querySelector('.score-point-p');
         if(score_point_display){
             score_point_display.textContent = target_score.toString();
@@ -210,10 +272,14 @@ function levelSelection(){
             const currentLevel = btn.getAttribute('data-level');
             const targetScore = btn.getAttribute('data-targetScore');
 
+
+
             GAME_STATE.level = currentLevel;
             // console.log(GAME_STATE.level);
             GAME_STATE.score_target = targetScore;
             // console.log(GAME_STATE.score_target);
+
+            addConfig();
         })
     })
 }
@@ -243,12 +309,25 @@ function navigateScreen(){
 // hàm vẽ board
 function drawBoard(board, context){
     for (let row = board.length === TOTAL_ROWS? BUFFER: 0; row < board.length ; row++) {
+        let rowHaveBlock = false;
         for (let col = 0; col < board[0].length; col++) {
             let x = col * SCALE;
             let y = board.length === TOTAL_ROWS? (row - BUFFER) * SCALE: row * SCALE;
             let color = board[row][col];
 
             drawSquare(x, y, color, context);
+            if(color !== 0){
+                rowHaveBlock = true;
+            }
+        }
+        // vẽ sương mù cho bàn cờ của level 4
+        if(parseInt(GAME_STATE.level) === 4 && GAME_STATE.config.isFog && context === CTX && rowHaveBlock){
+            for (let col = 0; col < board[0].length; col++) {
+                let x = col * SCALE;
+                let y =  (row - BUFFER) * SCALE;
+                drawSquare(x,y, 8, context);
+            }
+
         }
     }
 }
@@ -297,8 +376,55 @@ function gameLoop(timeStamp){
 
         GAME_STATE.lastTimeStamp = timeStamp;
         GAME_STATE.timeCounter += timePass;
-        if(GAME_STATE.timeCounter  >= GAME_STATE.interval){
-            GAME_STATE.timeCounter -= GAME_STATE.interval;
+
+        // level 2 tăng tốc độ
+        let curInterval = GAME_STATE.config.interval;
+        if(parseInt(GAME_STATE.level) === 2){
+            const progress = Math.min(GAME_STATE.score / GAME_STATE.score_target, 1);
+            curInterval = GAME_STATE.config.maxInterval -
+                (GAME_STATE.config.maxInterval -GAME_STATE.config.minInterval) * progress;
+            // console.log(curInterval);
+        }
+
+        // level 4 sương mù ẩn hiện mỗi 3 giây
+        if(parseInt(GAME_STATE.level) === 4){
+            GAME_STATE.config.fogTimer += timePass;
+            const fogTime = GAME_STATE.config.isFog? 4000: 2000
+            if( GAME_STATE.config.fogTimer >= fogTime){
+                GAME_STATE.config.fogTimer -= fogTime;
+                GAME_STATE.config.isFog = !GAME_STATE.config.isFog;
+            }
+        }
+
+        // level 5 gió đột xuất thổi hướng bất kỳ mỗi 2 giây
+        if(parseInt(GAME_STATE.level) === 5 && GAME_STATE.config.surpriseWind){
+            GAME_STATE.config.windTimer += timePass;
+            if(GAME_STATE.config.windTimer >= 2000){
+                GAME_STATE.config.windTimer -= 2000;
+                surpriseWind();
+            }
+        }
+
+        // level 6 cứ sau mỗi 2.8 giây khối hiện tại biến ngẫu nhiên thành khối khác
+        if(parseInt(GAME_STATE.level) === 6 && GAME_STATE.config.isShapeShifter){
+            const allTetris = Object.keys(TETRIS_PIECES);
+            const randomTetris = allTetris[Math.floor(Math.random() * allTetris.length)];
+            // console.log(randomTetris);
+
+            const oldTetris = GAME_STATE.player.current_piece;
+            const newTetris = TETRIS_PIECES[randomTetris].matrix;
+            GAME_STATE.config.shapeShifterTimer += timePass;
+
+            if(GAME_STATE.config.shapeShifterTimer >= 2800){
+                GAME_STATE.config.shapeShifterTimer -= 2800;
+                GAME_STATE.player.current_piece = newTetris;
+                if(isCollide())
+                    GAME_STATE.player.current_piece = oldTetris;
+            }
+
+        }
+        if(GAME_STATE.timeCounter  >= curInterval){
+            GAME_STATE.timeCounter -= curInterval;
 
             // console.log(T_BAG, predict_piece_matrix, xPredict, yPredict);
             // Thực hiện sau 1 giây có những phương thức
@@ -456,6 +582,22 @@ function displayWin(){
     }
 }
 
+// hàm di chuyển khối do gió lvl 5
+function surpriseWind(){
+    const dirTemp = ["x","y"];
+    const dir = dirTemp[Math.floor(Math.random()*dirTemp.length)];
+
+    const blow = GAME_STATE.config.windBlow[Math.floor(Math.random()* GAME_STATE.config.windBlow.length)];
+
+    GAME_STATE.player.position[dir] += blow;
+
+    if (isCollide()) {
+        GAME_STATE.player.position[dir] -= blow;
+    }
+
+
+}
+
 // hàm di chuyển khối hiện tại xuống mỗi giây
 function gravity(){
     GAME_STATE.player.position.y += 1;
@@ -489,7 +631,20 @@ function rotate(){
 // hàm di chuyển khối tetris hiện tại
 function moveTetris(){
     window.addEventListener('keydown', function(e){
-        switch (e.key){
+        let key = e.key;
+        // lvl 3 đảo chiều
+        if(GAME_STATE.config.reverseDirect){
+            console.log (GAME_STATE.config.reverseDirect);
+            if(e.key === 'ArrowUp')
+                key = 'ArrowDown';
+            else if(e.key === 'ArrowLeft')
+                key = 'ArrowRight';
+            else if(e.key === 'ArrowRight')
+                key = 'ArrowLeft';
+            else if(e.key === 'ArrowDown')
+                key = 'ArrowUp';
+        }
+        switch (key){
             case 'ArrowUp':
                 rotate();
                 break;
@@ -551,7 +706,7 @@ function resetGame(){
     if (selectedBtn) {
         selectedBtn.classList.remove('active');
     }
-
+    addConfig();
     clearCanvas();
     CTX_PREDICT.clearRect(0, 0, CANVAS_PREDICT.width, CANVAS_PREDICT.height);
     updateScore(0);
@@ -571,6 +726,8 @@ function restartGame(){
     GAME_STATE.player.isFirstWin = isFirstWin;
     GAME_STATE.score_target = curTaget;
     GAME_STATE.level = curLevel;
+
+    addConfig();
     renderPlayScreenUI();
 
     GAME_STATE.lastTimeStamp = performance.now();
