@@ -1,4 +1,7 @@
 const levelBtn = document.querySelectorAll('.btn-level');
+const PLAY_BTN = document.getElementById('btn-play');
+const CURRENT_SCORE_POINT = document.getElementById('current-score-point');
+const PAUSE_BTN = document.getElementById('pause');
 
 const CANVAS = document.getElementById('tetris-screen');
 const CTX = CANVAS.getContext('2d');
@@ -14,7 +17,7 @@ const SCALE = 30;
 const BUFFER = 4;
 const TOTAL_ROWS = ROWS + BUFFER;
 
-const TETRIS_BLOCK = {
+const TETRIS_PIECES = {
     // Tính theo ma trận luôn bắt đầu dòng và cột là 0
     'J':{
         matrix: [
@@ -98,7 +101,7 @@ const TETRIS_BLOCK = {
     },
 
 }
-const BLOCK_COLOR={
+const PIECE_COLOR={
     0: '#FFF', // Không có khối
     1: '#0000F0', // khối J
     2: '#DDA422', // Khối L
@@ -116,25 +119,51 @@ const STATE={
     PAUSE: 'PAUSE',
     OVER: 'OVER'
 };
-const GAME_STATE={
-    current_state: STATE.MENU,
-    level: 0,
-    score:0,
-    board:  Array.from({length: TOTAL_ROWS}, () => Array(COLS).fill(0)),
-    board_predict: Array.from({length: ROWS_PREDICT}, () => Array(COLS_PREDICT).fill(0)),
-    interval: 1000,
-    lastTimeStamp:0,
-    timeCounter:0,
-    player: {
-        current_block: T_BAG[0], // mảng 2 chiều của khối hiện tại
-        next_block: T_BAG[1], // mảng 2 chiều của khối tiếp theo
-        position: {x: 0, y: 0}
-    }
+    const createGAME_STATE= () => ({
+        current_state: STATE.MENU,
+        level: 1,
+        score: 0,
+        score_target:0,
+        board:  Array.from({length: TOTAL_ROWS}, () => Array(COLS).fill(0)),
+        board_predict: Array.from({length: ROWS_PREDICT}, () => Array(COLS_PREDICT).fill(0)),
+        interval: 1000,
+        lastTimeStamp:0,
+        timeCounter:0,
+        player: {
+            current_piece: null, // mảng 2 chiều của khối hiện tại
+            next_piece: null, // mảng 2 chiều của khối tiếp theo
+            position: {x: 0, y: 0},
+            position_predict: {x: 0, y: 0}
+        }
+    });
+
+let GAME_STATE = createGAME_STATE();
+let animationID;
+
+// hàm render lvl và target score cho play screen ui
+function renderPlayScreenUI(){
+    const curLevel = document.getElementById('current-level');
+    curLevel.textContent = GAME_STATE.level;
+
+    const curTargetScore = document.getElementById('target-score');
+    curTargetScore.textContent = GAME_STATE.score_target;
 }
 
+//hàm render target score và thêm dataset score cho main menu screen UI
+function renderMainMenuUI(){
+    levelBtn.forEach((btn) => {
+        const lvl = parseInt(btn.getAttribute('data-level'));
+        const target_score = 1000 * lvl;
+        const score_point_display = btn.querySelector('.score-point-p');
+        if(score_point_display){
+            score_point_display.textContent = target_score.toString();
+        }
+        btn.setAttribute('data-targetScore', target_score.toString());
+    })
+}
 // Hàm tạo list 7 khối random
 function createTBag() {
-    const tempBag = Object.keys(TETRIS_BLOCK);
+    const tempBag = Object.keys(TETRIS_PIECES);
     const Bag=[];
     for (let i = tempBag.length; i > 0 ; i--) {
         const random = Math.floor(Math.random() * i)
@@ -156,10 +185,16 @@ function levelSelection(){
             } else if(!selectedBtn){
                 e.currentTarget.classList.add('active');
             }
+            const currentLevel = btn.getAttribute('data-level');
+            const targetScore = btn.getAttribute('data-targetScore');
+
+            GAME_STATE.level = currentLevel;
+            // console.log(GAME_STATE.level);
+            GAME_STATE.score_target = targetScore;
+            // console.log(GAME_STATE.score_target);
         })
     })
 }
-levelSelection();
 
 // hàm chuyển screen
 function navigateScreen(){
@@ -185,34 +220,33 @@ function navigateScreen(){
 
 // hàm vẽ board
 function drawBoard(board, context){
-    for (let row = 0; row < board.length; row++) {
+    for (let row = board.length === TOTAL_ROWS? BUFFER: 0; row < board.length ; row++) {
         for (let col = 0; col < board[0].length; col++) {
             let x = col * SCALE;
-            let y = row * SCALE;
+            let y = board.length === TOTAL_ROWS? (row - BUFFER) * SCALE: row * SCALE;
             let color = board[row][col];
 
             drawSquare(x, y, color, context);
         }
-
     }
 }
 
-// Hàm vẽ khối block hiện tại của người chơi
-function drawPiece(x, y, block_matrix, context){
-    for (let row = 0; row < block_matrix.length; row++) {
-        for (let col = 0; col < block_matrix[0].length; col++) {
-            let color = block_matrix[row][col]
+// Hàm vẽ khối piece hiện tại của người chơi
+function drawPiece(x, y, piece_matrix, context){
+    for (let row = 0; row < piece_matrix.length; row++) {
+        for (let col = 0; col < piece_matrix[0].length; col++) {
+            let color = piece_matrix[row][col]
             if(color !== 0) {
-                let blockX = (x + col) * SCALE;
-                let blockY = (y +row) * SCALE;
-                drawSquare(blockX, blockY, color, context);
+                let pieceX = (x + col) * SCALE;
+                let pieceY = context === CTX? (y +row - BUFFER) * SCALE: (y +row) * SCALE;
+                drawSquare(pieceX, pieceY, color, context);
             }
         }
     }
 }
 // hàm vẽ ô vuông
 function drawSquare(x, y, color, context) {
-    context.fillStyle =  BLOCK_COLOR[color];
+    context.fillStyle =  PIECE_COLOR[color];
     context.fillRect(x, y, SCALE, SCALE);
 
     context.strokeStyle = "#111";
@@ -222,38 +256,294 @@ function drawSquare(x, y, color, context) {
 }
 
 //  Hàm xóa sạch canvas
-function clearCanvas(){
-    CTX.fillRect(0,0, CANVAS.with, CANVAS.height);
+function clearCanvas() {
+    CTX.clearRect(0, 0, CANVAS.with, CANVAS.height);
 }
-
 // Hàm loop game
 function gameLoop(timeStamp){
-    const predict_block_matrix = TETRIS_BLOCK[GAME_STATE.player.next_block].matrix;
-    const xPredict = TETRIS_BLOCK[GAME_STATE.player.next_block].x_predict;
-    const yPredict = TETRIS_BLOCK[GAME_STATE.player.next_block].y_predict;
-
-    const timePass = timeStamp - GAME_STATE.lastTimeStamp;
-
-    GAME_STATE.lastTimeStamp = timeStamp;
-    GAME_STATE.timeCounter += timePass;
-    if(GAME_STATE.timeCounter  >= GAME_STATE.interval){
-        GAME_STATE.timeCounter -= GAME_STATE.interval;
-
-        // console.log(T_BAG, predict_block_matrix, xPredict, yPredict);
-        // Thực hiện sau 1 giây có những phương thức
+    if(GAME_STATE.current_state === STATE.PAUSE){
+        GAME_STATE.lastTimeStamp = timeStamp;
+        animationID = requestAnimationFrame(gameLoop);
+        return;
 
     }
+    if(GAME_STATE.current_state === STATE.PLAYING){
+        const xPredict = GAME_STATE.player.position_predict.x;
+        const yPredict = GAME_STATE.player.position_predict.y;
 
-    clearCanvas();
-    drawBoard(GAME_STATE.board_predict, CTX_PREDICT);
-    drawPiece(xPredict, yPredict, predict_block_matrix, CTX_PREDICT);
+        const timePass = timeStamp - GAME_STATE.lastTimeStamp;
+
+        GAME_STATE.lastTimeStamp = timeStamp;
+        GAME_STATE.timeCounter += timePass;
+        if(GAME_STATE.timeCounter  >= GAME_STATE.interval){
+            GAME_STATE.timeCounter -= GAME_STATE.interval;
+
+            // console.log(T_BAG, predict_piece_matrix, xPredict, yPredict);
+            // Thực hiện sau 1 giây có những phương thức
+            gravity();
+
+        }
+
+        clearCanvas();
+
+        // vẽ cho cái dự đoán tetris tiếp theo
+        drawBoard(GAME_STATE.board_predict, CTX_PREDICT);
+        drawPiece(xPredict, yPredict, GAME_STATE.player.next_piece, CTX_PREDICT);
+
+        // Vẽ cho bàn cờ chính
+        drawBoard(GAME_STATE.board, CTX);
+        drawPiece(GAME_STATE.player.position.x, GAME_STATE.player.position.y, GAME_STATE.player.current_piece, CTX);
 
 
-    requestAnimationFrame(gameLoop);
+        animationID = requestAnimationFrame(gameLoop);
+    }
+
 }
+
+// hàm thêm 7 khối tetris random vào T_BAG
+function addTBag(){
+    const tempBag = createTBag();
+    for (let i=0; i < tempBag.length; i++){
+        T_BAG.push(tempBag[i]);
+    }
+}
+// hàm lấy phần tử đầu tiên trong T_BAG và thêm phần tử tiếp theo vào next piece
+function spawnNewTetris(){
+    if(T_BAG.length < 2){
+        addTBag();
+    }
+
+    GAME_STATE.player.position.x = TETRIS_PIECES[T_BAG.slice(0,1)].x;
+    GAME_STATE.player.position.y = TETRIS_PIECES[T_BAG.slice(0,1)].y;
+    GAME_STATE.player.current_piece = TETRIS_PIECES[T_BAG.shift()].matrix;
+
+    GAME_STATE.player.position_predict.x = TETRIS_PIECES[T_BAG.slice(0,1)].x_predict;
+    GAME_STATE.player.position_predict.y = TETRIS_PIECES[T_BAG.slice(0,1)].y_predict;
+    GAME_STATE.player.next_piece =  TETRIS_PIECES[T_BAG[0]].matrix;
+
+}
+
+// hàm trả về true có va chạm với khối hoặc biên
+function isCollide(){
+    const currentX = GAME_STATE.player.position.x;
+    const currentY = GAME_STATE.player.position.y;
+    const currentPieceMatrix = GAME_STATE.player.current_piece;
+
+    for (let row = 0; row < currentPieceMatrix.length; row++) {
+        for (let col = 0; col < currentPieceMatrix[0].length; col++) {
+            const squareX = currentX + col;
+            const squareY = currentY + row;
+
+            if(currentPieceMatrix[row][col] !== 0){
+                // console.log("\n");
+                // vượt khỏi bàn cờ 24 dòng 10 cột (va chạm biên)
+                if( (0 > squareX || squareX > 9 || 0 > squareY || squareY > 23) ){
+                    return true;
+                }
+
+                // va chạm với khối
+                else if (GAME_STATE.board[squareY][squareX] !== 0){
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+// hàm cập nhật điểm khi ăn dòng
+function updateScore(totalClearedLines) {
+    if(totalClearedLines !== 0){
+        const score = 100;
+        GAME_STATE.score += totalClearedLines * score + (score * (totalClearedLines - 1));
+        CURRENT_SCORE_POINT.textContent = GAME_STATE.score;
+    }
+    // restart cập nhật lại điểm
+    if(totalClearedLines === 0){
+        CURRENT_SCORE_POINT.textContent = GAME_STATE.score;
+    }
+}
+
+// hàm xóa dòng khi đủ  và gọi hàm updateScore
+function clearLines(){
+    let totalClearedLines = 0;
+    for (let row = 23; row >= 0; row--){
+        let canClear = true;
+        for (let col = 9; col >= 0; col--){
+            if(GAME_STATE.board[row][col] === 0){
+                canClear = false;
+                break;
+            }
+        }
+        if(canClear){
+            const emptyRow = Array(10).fill(0);
+            GAME_STATE.board.splice(row, 1);
+            GAME_STATE.board.unshift(emptyRow);
+            totalClearedLines++;
+            row++;
+        }
+    }
+    updateScore(totalClearedLines);
+}
+
+// hàm merge khối vào bàn cờ
+function mergeBoard(){
+    const currentX = GAME_STATE.player.position.x;
+    const currentY = GAME_STATE.player.position.y;
+    const currentPieceMatrix = GAME_STATE.player.current_piece;
+    for (let row = 0; row <currentPieceMatrix.length; row++) {
+        for (let col = 0; col < currentPieceMatrix[0].length; col++) {
+            if(currentPieceMatrix[row][col] !== 0){
+                GAME_STATE.board[currentY + row][currentX + col] = currentPieceMatrix[row][col];
+            }
+        }
+    }
+}
+
+// hàm di chuyển khối hiện tại xuống mỗi giây
+function gravity(){
+    GAME_STATE.player.position.y += 1;
+    if(isCollide()){
+        GAME_STATE.player.position.y -= 1;
+        mergeBoard();
+        clearLines();
+        spawnNewTetris();
+    }
+}
+
+// hàm rotate khối
+function rotate(){
+    const currentPieceMatrix = GAME_STATE.player.current_piece;
+    const tempPiece = structuredClone(currentPieceMatrix);
+    const afterRotate = Array.from({length: currentPieceMatrix.length}
+        , ()=> Array(currentPieceMatrix[0].length).fill(0)) ;
+    for (let row = 0; row < currentPieceMatrix.length; row++){
+        for (let col = 0; col < currentPieceMatrix[0].length; col++) {
+                afterRotate[col][(currentPieceMatrix.length -1) - row] = tempPiece[row][col];
+        }
+    }
+    GAME_STATE.player.current_piece = afterRotate;
+    if(isCollide()){
+        GAME_STATE.player.current_piece = tempPiece;
+    }
+}
+
+// hàm di chuyển khối tetris hiện tại
+function moveTetris(){
+    window.addEventListener('keydown', function(e){
+        switch (e.key){
+            case 'ArrowUp':
+                rotate();
+                break;
+            case 'ArrowDown':
+                gravity();
+                break;
+            case 'ArrowLeft':
+                GAME_STATE.player.position.x -= 1;
+                if(isCollide()){
+                    GAME_STATE.player.position.x += 1;
+                }
+                break;
+            case 'ArrowRight':
+                GAME_STATE.player.position.x += 1;
+                if(isCollide()){
+                    GAME_STATE.player.position.x -= 1;
+                }
+                break;
+        }
+    })
+}
+// gán sự kiện cho nút play game
+function clickedPlayBtn(){
+    PLAY_BTN.addEventListener('click', function(e){
+        renderPlayScreenUI();
+        GAME_STATE.current_state = STATE.PLAYING;
+        GAME_STATE.lastTimeStamp = performance.now();
+        moveTetris();
+        spawnNewTetris();
+        clickedPauseBtn();
+        requestAnimationFrame(gameLoop);
+    })
+}
+
+// gán sự kiện cho nút pause trong play screen
+function clickedPauseBtn(){
+    PAUSE_BTN.addEventListener('click', function(e){
+        const pauseOverlay = document.querySelector('.pause-overlay');
+        if(pauseOverlay){
+            pauseOverlay.classList.add('active');
+            GAME_STATE.current_state = STATE.PAUSE;
+            clickedBtnPauseOverlay();
+        }
+    })
+}
+
+// hàm xóa active của overlay
+function removeActiveOverlay(nameOverlay){
+        const overlay = document.querySelector(`.${nameOverlay}.active`);
+        if(overlay){
+            overlay.classList.remove('active');
+        }
+}
+
+// hàm resetGame reset lại trạng thái game về ban đầu
+function resetGame(){
+    cancelAnimationFrame(animationID);
+    T_BAG.splice(0, T_BAG.length);
+    Object.assign(GAME_STATE, createGAME_STATE());
+    GAME_STATE.lastTimeStamp = performance.now();
+    GAME_STATE.current_state= STATE.PLAYING;
+    spawnNewTetris();
+    updateScore(0);
+    animationID = requestAnimationFrame(gameLoop);
+}
+
+// hàm gán sự kiện cho 3 nút trong pause overlay
+function clickedBtnPauseOverlay(){
+    const allBtn = document.querySelectorAll('[data-panelOption]');
+    allBtn.forEach((button) => {
+        button.addEventListener('click', function(e){
+            if(button.getAttribute('data-panelOption') === "Resume"){
+                GAME_STATE.current_state = STATE.PLAYING;
+                removeActiveOverlay("pause-overlay");
+            }
+            else if(button.getAttribute('data-panelOption') === "Restart"){
+                resetGame();
+                removeActiveOverlay("pause-overlay");
+
+            } else{
+                resetGame();
+                GAME_STATE.current_state = STATE.MENU;
+                navigateScreen();
+                removeActiveOverlay("pause-overlay");
+            }
+        })
+    })
+}
+// hàm kích hoạt nút pasue button trong play screen
+function triggerPauseButton(){
+    const pauseOverlay = document.querySelector('.pause-overlay');
+    if(pauseOverlay) {
+        pauseOverlay.classList.add('active');
+        GAME_STATE.current_state = STATE.PAUSE;
+        clickedBtnPauseOverlay();
+    }
+}
+// hàm kiểm tra xem người dùng có tab sang trang khác ko
+function checkTabVisibility(){
+    document.addEventListener('visibilitychange', function(e){
+        if(document.visibilityState === 'hidden'){
+            triggerPauseButton();
+        }
+    })
+}
+
 // hàm bắt đầu game
-function startGame(){
+function initGame(){
+    renderMainMenuUI();
+    levelSelection();
     navigateScreen();
-    requestAnimationFrame(gameLoop);
+    clickedPlayBtn();
+    checkTabVisibility();
 }
-startGame();
+initGame();

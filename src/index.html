@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="card-footer">
-                        <span class="score-point">Target: 500</span>
+                        <span class="score-point">Target: </span><span class="score-point-p"></span>
                     </div>
                 </button>
             </li>
@@ -55,7 +55,7 @@
                     </div>
 
                     <div class="card-footer">
-                        <span class="score-point">Target: 500</span>
+                        <span class="score-point">Target: </span><span class="score-point-p"></span>
                     </div>
                 </button>
             </li>
@@ -74,7 +74,7 @@
                     </div>
 
                     <div class="card-footer">
-                        <span class="score-point">Target: 500</span>
+                        <span class="score-point">Target: </span><span class="score-point-p"></span>
                     </div>
                 </button>
             </li>
@@ -93,7 +93,7 @@
                     </div>
 
                     <div class="card-footer">
-                        <span class="score-point">Target: 500</span>
+                        <span class="score-point">Target: </span><span class="score-point-p"></span>
                     </div>
                 </button>
             </li>
@@ -112,7 +112,7 @@
                     </div>
 
                     <div class="card-footer">
-                        <span class="score-point">Target: 500</span>
+                        <span class="score-point">Target: </span><span class="score-point-p"></span>
                     </div>
                 </button>
             </li>
@@ -131,7 +131,7 @@
                     </div>
 
                     <div class="card-footer">
-                        <span class="score-point">Target: 500</span>
+                        <span class="score-point">Target: </span><span class="score-point-p"></span>
                     </div>
                 </button>
             </li>
@@ -139,7 +139,7 @@
     </div>
 
     <div class="menu-footer">
-        <button class="nav-btn btn-play" data-screen="play-screen">
+        <button class="nav-btn btn-play" data-screen="play-screen" id="btn-play">
             <i class="fa-solid fa-play"></i>
             <span class="play-title">PLAY NOW</span>
         </button>
@@ -152,7 +152,7 @@
 <div id="play-screen" class="play-screen screen">
 
 <!--    Lớp phủ dừng màn hình-->
-    <div class="pause-overlay">
+    <div class="pause-overlay overlay" id="pause-overlay">
         <div class="pause-panel">
             <div class="panel-title">
                 <i class="fa-solid fa-pause"></i>
@@ -161,17 +161,17 @@
 
 
             <div class="panel-option">
-                <button class="resume" id="resume">
+                <button class="resume" id="resume" data-panelOption="Resume">
                     <i class="fa-regular fa-circle-play"></i>
                     <span class="resume-title">Resume</span>
                 </button>
 
-                <button class="Restart" id="restart">
+                <button class="Restart" id="restart"  data-panelOption="Restart">
                     <i class="fa-solid fa-rotate-left"></i>
                     <span class="restart-title">Restart</span>
                 </button>
 
-                <button class="main-menu" id="main-menu">
+                <button class="main-menu" id="main-menu"  data-panelOption="MainMenu" data-screen="main-menu-screen">
                     <i class="fa-solid fa-house"></i>
                     <span class="resume-title">Main Menu</span>
                 </button>
@@ -205,19 +205,19 @@
 
             <div class="score-wrapper">
                 <p class="current-score">Score</p>
-                <p class="current-score-point">24440</p>
+                <p class="current-score-point" id ="current-score-point">0</p>
             </div>
 
             <div class="target-wrapper">
                 <p class="target-score">Target score</p>
-                <p class="target-score-point">24440</p>
+                <p class="target-score-point" id ="target-score">0</p>
             </div>
         </div>
 
 
 <!--        Khối pause-->
         <div class="pause-wrapper">
-            <button class="pause">
+            <button class="pause" id="pause">
                 <i class="fa-solid fa-pause"></i>
                 <span class="pause-title">PAUSE GAME</span>
             </button>

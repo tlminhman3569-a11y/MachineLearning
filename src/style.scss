@@ -127,7 +127,7 @@ body{
   margin-top: 60px;
   align-items: center;
 
-  .score-point{
+  .score-point, .score-point-p{
     color: black;
     font-size:0.9rem;
   }
@@ -178,7 +178,7 @@ body{
   display:none;
 }
 
-.pause-overlay.active{
+.pause-overlay.overlay.active{
   position: absolute;
   top: 0;
   left: 0;
