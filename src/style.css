@@ -163,7 +163,11 @@ body {
   display: none;
 }
 
-.pause-overlay.overlay.active, .over-overlay.overlay.active {
+.win-overlay {
+  display: none;
+}
+
+.pause-overlay.overlay.active, .over-overlay.overlay.active, .win-overlay.overlay.active {
   position: absolute;
   top: 0;
   left: 0;

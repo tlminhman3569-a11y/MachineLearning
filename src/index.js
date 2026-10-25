@@ -117,7 +117,8 @@ const STATE={
     MENU: 'MENU',
     PLAYING: 'PLAYING',
     PAUSE: 'PAUSE',
-    OVER: 'OVER'
+    OVER: 'OVER',
+    WIN: 'WIN'
 };
     const createGAME_STATE= () => ({
         current_state: STATE.MENU,
@@ -133,7 +134,8 @@ const STATE={
             current_piece: null, // mảng 2 chiều của khối hiện tại
             next_piece: null, // mảng 2 chiều của khối tiếp theo
             position: {x: 0, y: 0},
-            position_predict: {x: 0, y: 0}
+            position_predict: {x: 0, y: 0},
+            isFirstWin: true,
         }
     });
 
@@ -151,7 +153,6 @@ function renderPlayScreenUI(){
 
 // hàm render current score và target score cho over ui
 function renderOverUI(){
-    clickedBtnOverlay();
     const curScore = document.getElementById('over-current-score');
     curScore.textContent = GAME_STATE.score;
     curScore.style.color = "#c61515";
@@ -160,11 +161,21 @@ function renderOverUI(){
     curTargetScore.textContent = GAME_STATE.score_target;
 }
 
-//hàm render target score và thêm dataset score cho main menu screen UI
+// hàm render current score và target score cho win ui
+function renderWinUI(){
+    const curScore = document.getElementById('win-current-score');
+    curScore.textContent = GAME_STATE.score;
+    curScore.style.color = "#008001";
+
+    const curTargetScore = document.getElementById('win-target-score');
+    curTargetScore.textContent = GAME_STATE.score_target;
+}
+
+//hàm render target score và thêm dataset score cho main menu screen UI và gán target score cho lvl
 function renderMainMenuUI(){
     levelBtn.forEach((btn) => {
         const lvl = parseInt(btn.getAttribute('data-level'));
-        const target_score = 1000 * lvl;
+        const target_score = (1000 * lvl) * 20 / 100;
         const score_point_display = btn.querySelector('.score-point-p');
         if(score_point_display){
             score_point_display.textContent = target_score.toString();
@@ -272,7 +283,7 @@ function clearCanvas() {
 }
 // Hàm loop game
 function gameLoop(timeStamp){
-    if(GAME_STATE.current_state === STATE.PAUSE){
+    if(GAME_STATE.current_state !== STATE.PLAYING){
         GAME_STATE.lastTimeStamp = timeStamp;
         animationID = requestAnimationFrame(gameLoop);
         return;
@@ -364,14 +375,24 @@ function isCollide(){
 
 // hàm cập nhật điểm khi ăn dòng
 function updateScore(totalClearedLines) {
-    if(passTarget()){
-        CURRENT_SCORE_POINT.style.color = "#008001";
-    }
     if(totalClearedLines !== 0){
         const score = 100;
         GAME_STATE.score += totalClearedLines * score + (score * (totalClearedLines - 1));
         CURRENT_SCORE_POINT.textContent = GAME_STATE.score;
     }
+
+    if(passTarget()){
+        CURRENT_SCORE_POINT.textContent = GAME_STATE.score;
+        CURRENT_SCORE_POINT.style.color = "#008001";
+
+        if(GAME_STATE.player.isFirstWin){
+            GAME_STATE.player.isFirstWin = false;
+            displayWin();
+        }
+    } else if(!passTarget()){
+        CURRENT_SCORE_POINT.style.color = "";
+    }
+
     // restart cập nhật lại điểm
     if(totalClearedLines === 0){
         CURRENT_SCORE_POINT.textContent = GAME_STATE.score;
@@ -421,6 +442,17 @@ function displayOver(){
     if(over_overlay){
         over_overlay.classList.add("active");
         renderOverUI();
+    }
+}
+
+// hàm hiển thị win game
+// hàm hiển thị kết thúc game do over
+function displayWin(){
+    GAME_STATE.current_state = STATE.WIN;
+    const win_overlay = document.getElementById("win-overlay");
+    if(win_overlay){
+        win_overlay.classList.add("active");
+        renderWinUI();
     }
 }
 
@@ -486,7 +518,6 @@ function clickedPlayBtn(){
         GAME_STATE.current_state = STATE.PLAYING;
         GAME_STATE.lastTimeStamp = performance.now();
         spawnNewTetris();
-        clickedPauseBtn();
         requestAnimationFrame(gameLoop);
     })
 }
@@ -498,7 +529,6 @@ function clickedPauseBtn(){
         if(pauseOverlay){
             pauseOverlay.classList.add('active');
             GAME_STATE.current_state = STATE.PAUSE;
-            clickedBtnOverlay();
         }
     })
 }
@@ -516,14 +546,43 @@ function resetGame(){
     cancelAnimationFrame(animationID);
     T_BAG.splice(0, T_BAG.length);
     Object.assign(GAME_STATE, createGAME_STATE());
-    GAME_STATE.lastTimeStamp = performance.now();
-    GAME_STATE.current_state= STATE.PLAYING;
-    spawnNewTetris();
+
+    const selectedBtn = document.querySelector('.btn-level.active');
+    if (selectedBtn) {
+        selectedBtn.classList.remove('active');
+    }
+
+    clearCanvas();
+    CTX_PREDICT.clearRect(0, 0, CANVAS_PREDICT.width, CANVAS_PREDICT.height);
     updateScore(0);
-    animationID = requestAnimationFrame(gameLoop);
+
 }
 
-// hàm gán sự kiện cho 3 nút trong pause overlay
+// hàm restartGame restart lại trạng thái game
+function restartGame(){
+    const curTaget = GAME_STATE.score_target;
+    const curLevel = GAME_STATE.level;
+    const isFirstWin = GAME_STATE.player.isFirstWin;
+
+    cancelAnimationFrame(animationID);
+    T_BAG.splice(0, T_BAG.length);
+    Object.assign(GAME_STATE, createGAME_STATE());
+
+    GAME_STATE.player.isFirstWin = isFirstWin;
+    GAME_STATE.score_target = curTaget;
+    GAME_STATE.level = curLevel;
+    renderPlayScreenUI();
+
+    GAME_STATE.lastTimeStamp = performance.now();
+    GAME_STATE.current_state= STATE.PLAYING;
+    updateScore(0);
+    spawnNewTetris();
+    animationID = requestAnimationFrame(gameLoop);
+
+}
+
+
+// hàm gán sự kiện cho 3 nút trong overlay
 function clickedBtnOverlay(){
     const allBtn = document.querySelectorAll('[data-Option]');
     allBtn.forEach((button) => {
@@ -531,11 +590,13 @@ function clickedBtnOverlay(){
             if(button.getAttribute('data-Option') === "Resume"){
                 GAME_STATE.current_state = STATE.PLAYING;
                 removeActiveOverlay("pause-overlay");
+                removeActiveOverlay("win-overlay");
             }
             else if(button.getAttribute('data-Option') === "Restart"){
-                resetGame();
+                restartGame();
                 removeActiveOverlay("over-overlay");
                 removeActiveOverlay("pause-overlay");
+                removeActiveOverlay("win-overlay");
 
             } else{
                 resetGame();
@@ -543,6 +604,7 @@ function clickedBtnOverlay(){
                 navigateScreen();
                 removeActiveOverlay("pause-overlay");
                 removeActiveOverlay("over-overlay");
+                removeActiveOverlay("win-overlay");
             }
         })
     })
@@ -553,7 +615,6 @@ function triggerPauseButton(){
     if(pauseOverlay) {
         pauseOverlay.classList.add('active');
         GAME_STATE.current_state = STATE.PAUSE;
-        clickedBtnOverlay();
     }
 }
 // hàm kiểm tra xem người dùng có tab sang trang khác ko
@@ -575,7 +636,9 @@ function initGame(){
     levelSelection();
     navigateScreen();
     clickedPlayBtn();
+    clickedBtnOverlay();
     moveTetris();
     checkTabVisibility();
+    clickedPauseBtn();
 }
 initGame();

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="https://cloudflare.com">
+
     <title>Tetris</title>
 </head>
 <body>
@@ -150,6 +152,42 @@
 
 <!-- trang giao diện chơi-->
 <div id="play-screen" class="play-screen screen">
+
+    <!-- lớp phủ game win-->
+    <div class="win-overlay overlay" id="win-overlay">
+        <div class="over-panel">
+            <div class="over-title">
+                <i class="fa-solid fa-trophy"></i>
+                <p class = "over-header-title">WIN</p>
+            </div>
+
+            <div class="over-describe">
+                <p class="describe">Chúc mừng bạn đã thắng!</p>
+
+                <p class="current-score">Score: <span class="current-score-point" id="win-current-score">0</span></p>
+
+
+                <p class="target-score">Target score: <span class="target-score-point" id ="win-target-score">0</span> </p>
+            </div>
+
+
+            <div class="panel-option">
+                <button class="resume" id="win-resume" data-Option="Resume">
+                    <i class="fa-regular fa-circle-play"></i>
+                    <span class="resume-title">Resume</span>
+                </button>
+                <button class="Restart" id="win-restart"  data-Option="Restart">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span class="restart-title">Restart</span>
+                </button>
+
+                <button class="main-menu" id="win-main-menu"  data-Option="MainMenu" data-screen="main-menu-screen">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="resume-title">Main Menu</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
 <!-- lớp phủ game over-->
     <div class="over-overlay overlay" id="over-overlay">
